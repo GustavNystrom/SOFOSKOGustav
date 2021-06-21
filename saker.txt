@@ -1,0 +1,12 @@
+msigdb
+uniprot (KB and ID-retrieve)
+MAF
+VCF
+GFF
+sqlite
+biopython
+chr1p36
+
+
+
+1. Parse the file and extract genes and mutations
