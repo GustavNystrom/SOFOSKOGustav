@@ -10,3 +10,16 @@ chr1p36
 
 
 1. Parse the file and extract genes and mutations
+
+
+analys:
+1. ladda MAF i pandas dataframe
+2. Ta första raden: titta på HGVSp för att hitta position av mutation
+3. skapa dokument me
+4. Sök igenom databas efter annoterade domäner mutationen kan ligga inom
+5. Om domän hittas
+
+
+Exempeldokument:
+
+AADACL3:

@@ -5,17 +5,20 @@ class Mutation:
 
     def __init__(self, row):
         self.gene = row['Hugo_Symbol']
-        self.chr = row['Chromosome']
-        self.startpos = row['Start_Position']
-        self.endpos = row['End_Position']
-        self.varclass = row['Variant_Classification']
-        self.vartype = row['Variant_Type']
-        self.refallele = row['Reference_Allele']
-        self.mutallele = row['Tumor_Seq_Allele2']
-        self.hgvsc = row['HGVSc']
-        self.hgvsp = row['HGVSp']
+        self.varclass = row['Variant_Classification']    
         self.hgvspshort = row['HGVSp_Short']
         self.mut_site = self.mut_site()
+        self.row = row
+    
+    def parse_row(self):
+        self.chr = self.row['Chromosome']
+        self.startpos = self.row['Start_Position']
+        self.endpos = self.row['End_Position']
+        self.vartype = self.row['Variant_Type']
+        self.refallele = self.row['Reference_Allele']
+        self.mutallele = self.row['Tumor_Seq_Allele2']
+        self.hgvsc = self.row['HGVSc']
+        self.hgvsp = self.row['HGVSp']
     
     def mut_site(self):
         """returns (start,stop) of the mutation on protein level"""
