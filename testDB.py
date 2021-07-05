@@ -1,11 +1,12 @@
 import DBCreator, GFFParser
-import logging
+import logging, os
+import settings
 
 logging.basicConfig(level=logging.INFO)
 
-file_gff = "uniprot-yourlist chr1p36.gff"
-file_mapping = "uniprot-mpngtbl-1p36.tab"
-db_file = r"F:\Skolgrejer\LÄKARPROGRAMMET\SOFOSKO\Databases\pythonsqlite.db"
+file_gff = os.path.join(settings.dir_loc, settings.gff_name)
+file_mapping = os.path.join(settings.dir_loc, settings.mapping_name)
+db_file = os.path.join(settings.dir_loc, settings.db_name)
 
 conn = DBCreator.create_connection(db_file)
 logging.info("created connection")

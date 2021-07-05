@@ -1,4 +1,4 @@
-import sqlite3, pprint
+import sqlite3, pprint, logging
 
 def gene_name_to_uniprotID(conn, name):
     """
@@ -28,8 +28,10 @@ def get_rows_from_gene_name(conn, name):
         rows.append(retrieve_gene(conn,i[0]))
     
     try:
+        logging.debug(f'Got rows in db from gene name: {name}')
         return rows[0]
     except:
+        logging.warning(f"Can't find a match for gene: {name}")
         #print("Can't find match for gene: ", name)
         return []
 
@@ -40,6 +42,14 @@ def get_row_from_ID(conn, id):
     cur = conn.cursor()
     cur.execute(statement, (str(id),))
     return cur.fetchall()[0]
+
+def get_feature(conn, id):
+    statement = '''
+    SELECT feature FROM data WHERE id=?
+    '''
+    cur = conn.cursor()
+    cur.execute(statement, (str(id),))
+    return cur.fetchall()[0][0]
 
 if __name__ == "__main__":
     import DBCreator as db

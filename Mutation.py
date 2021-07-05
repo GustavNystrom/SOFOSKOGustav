@@ -1,5 +1,6 @@
-import re
+import re, logging
 import numpy as np
+import test_script
 
 class Mutation:
 
@@ -22,13 +23,14 @@ class Mutation:
     
     def mut_site(self):
         """returns (start,stop) of the mutation on protein level"""
-
+        logging.debug(f"Varclass: {self.varclass}")
         exp = '(\D*)(\d*)'
         if self.varclass == "Missense_Mutation" or self.varclass == "Silent":
             try:
                 site = int(self.hgvspshort[3:-1])
                 site = (site, site)
             except:
+                logging.warning(f"Failed to identify mut_site for {self.gene}\nhgvspshort = {self.hgvspshort}")
                 #Missing data!
                 site = np.NaN
 
@@ -41,6 +43,7 @@ class Mutation:
                 matches = re.findall(exp, self.hgvspshort)
                 site = (int(matches[0][1]),np.NaN)
             except Exception as e:
+                logging.warning(f"Failed to identify mut_site for {self.gene}\nhgvspshort = {self.hgvspshort}\n Error: {e}")
                 site = np.NaN
         
         #TODO: Define the site better. Perhaps the entire protein, perhaps from the start to the end of the protein?
@@ -49,9 +52,11 @@ class Mutation:
                 matches = re.findall(exp, self.hgvspshort)
                 site = (int(matches[0][1]), int(matches[1][1])+int(matches[0][1]))
             except (TypeError) as e:
+                logging.warning(f'Missing data for {self.gene}\nHGVSpshort = {self.hgvspshort}')
                 print('Missing data')
                 site = np.NaN
             except:
+                logging.debug(f'Created an early termination, hgvspshort={self.hgvspshort}')
                 # If it creates an early termination!
                 site = (int(matches[0][1]), np.NaN)
         
@@ -72,5 +77,56 @@ class Mutation:
         else:
             print('Unknown mutation type')
             site = np.NaN
-        
+        logging.debug(f'Finished identifying mut_site, mut_site={site}')
         return site
+
+
+def compare_mutations(df, conn):
+	missing_genes = 0
+	matched_rows = []
+	for rown in range(len(df)):
+		logging.debug(f'Started working on row number {rown}')
+		if rown % 1000 == 0:
+			print('Worked through row number: ', rown)
+		#Create a mutation object for the current row
+		row = Mutation(df.iloc[rown])
+		logging.debug(f'Created a Mutation object from row {rown}')
+
+		#Get all the annotated rows from the database which maps to this gene
+		uniprot_annotated = test_script.get_rows_from_gene_name(conn, row.gene)
+		if uniprot_annotated == []:
+			missing_genes += 1
+			logging.info('Missing gene appended. Continuing...')
+			continue
+
+		# iterate over the rows to find if the mutation is within an annotated domain
+		logging.debug(f'Started trying to find a match for rown: {rown}')
+		for i in uniprot_annotated:
+						
+			#Get the start and end of the annotated region
+			annotated_region = (int(i[4]),int(i[5]))
+			logging.debug(f'Coordinates for annotated region mutation: {annotated_region}\nCoordinates for maf-mutation: {row.mut_site}')
+
+			#These conditions are setup to find if mutation is within an annotated domain
+			# TODO: what to do if (int, np.NaN)??
+
+			if row.mut_site is np.NaN:
+				logging.debug('mutation site for maf-mutation is undefined, continues...')
+				continue
+			# TODO: define how to calculate if the mut_site is within the annotated region, see readme
+			elif row.mut_site[0] <= annotated_region[0] and row.mut_site[1] >= annotated_region[0]: #1
+				logging.debug('Mutation matched at condition 1')
+				match = df.iloc[rown].tolist()
+				match.append(i[0])
+				matched_rows.append(match)
+			elif row.mut_site[0] <= annotated_region[1] and row.mut_site[1] >= annotated_region[1]: #2
+				logging.debug('Mutation matched at condition 2')
+				match = df.iloc[rown].tolist()
+				match.append(i[0])
+				matched_rows.append(match)
+			elif row.mut_site[0] <= annotated_region[1] and row.mut_site[0] is np.NaN: #3
+				logging.debug('Mutation matched at condition 3')
+				match = df.iloc[rown].tolist()
+				match.append(i[0])
+				matched_rows.append(match)
+	return (matched_rows, missing_genes)
