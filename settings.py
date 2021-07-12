@@ -1,11 +1,11 @@
 # Location where new files are created
 
-dir_loc = r'F:\Skolgrejer\LÄKARPROGRAMMET\SOFOSKO\Code'
+dir_loc = r'C:\Users\gusny\OneDrive\Dokument\SOFOSKO'
 
 #Main_function
 
 # Database name
-db_name = 'pythonsqlite.db'
+db_name = 'testdb.db'
 
 #GFF file name
 gff_name = 'uniprot-test-list.gff'
@@ -56,6 +56,9 @@ df_labels = [
 
 #Logging filename
 logging_name = 'Runtime_log.log'
+
+#Logging database creation
+logging_db_name = 'DB_log.log'
 
 #Features affected name
 features_affected = 'features_affected.txt'

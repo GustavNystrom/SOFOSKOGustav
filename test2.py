@@ -5,8 +5,7 @@ import pandas as pd
 
 def gene_list(genes, filename):
    # Create a file containing each unique item from a list
-   name = os.path.join(settings.dir_loc, filename)
-   with open(name, 'w') as file:
+   with open(filename, 'w') as file:
       for gene in genes:
          file.write(gene + '\n')
    print('SUccessfully created ', filename)
@@ -26,8 +25,8 @@ def mutations_per_gene(dataframe, filename, base_path):
         plt.annotate(f"({value_counts.index[n]}, {value_counts[n]})", (value_counts.index[n], value_counts[n]))
 
     logging.info('Created plot with mutations per gene')
-    plt.savefig(os.path.join(settings.dir_loc, settings.mutations_per_gene_name))
-    #plt.show()
+    plt.show()
+    plt.savefig(os.path.join(settings.dir_loc, settings.mutations_per_gene_name))   
    
 def create_dataframe(data, filename, base_path):
     # Creates a dataframe and dumps it onto a csv with \t as separator. Returns the dataframe.

@@ -27,15 +27,16 @@ dict_keys = ['uniprotID',
 def GFFParse(filename):
     '''
     A generator parsing the GFF-file using the csv module. 
-    Returns a dictionary with all its values as strings.
+    Returns a list with all of its values as strings.
     '''
+    
     with open(filename, 'r') as file:
         file_gen = csv.reader(file, delimiter='\t')
         for i in file_gen:
             if len(i) < 9:
                 continue
-            i_dict = dict(zip(dict_keys, i[0:9]))
-            yield (i_dict, tuple(i[0:9]))
+            # i_dict = dict(zip(dict_keys, i[0:9]))
+            yield i[0:9]
 
 def map_parse(filename):
         with open(filename, 'r') as file:
