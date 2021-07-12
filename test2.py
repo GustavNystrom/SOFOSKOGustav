@@ -18,15 +18,16 @@ def mutations_per_gene(dataframe, filename, base_path):
     value_counts.to_csv(file_name, sep='\t', header=['Count'], index_label='Hugo_Symbol')
     logging.info(f'Wrote the mutations per gene to file: {file_name}')
     plt.scatter(value_counts.index[0:settings.n_mutations], value_counts[0:settings.n_mutations])
+    #plt.figure(figsize=(10.0,10.0))
     plt.title(f'The {settings.n_mutations} most mutated genes')
     plt.ylabel('Number of mutations')
     plt.xlabel('Gene name')
-    #plt.figure(figsize=(15,10), dpi=100)
     for n in range(len(value_counts)):
         plt.annotate(f"({value_counts.index[n]}, {value_counts[n]})", (value_counts.index[n], value_counts[n]))
 
     logging.info('Created plot with mutations per gene')
-    plt.show()
+    plt.savefig(os.path.join(settings.dir_loc, settings.mutations_per_gene_name))
+    #plt.show()
    
 def create_dataframe(data, filename, base_path):
     # Creates a dataframe and dumps it onto a csv with \t as separator. Returns the dataframe.

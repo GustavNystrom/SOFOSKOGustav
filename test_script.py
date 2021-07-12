@@ -51,6 +51,14 @@ def get_feature(conn, id):
     cur.execute(statement, (str(id),))
     return cur.fetchall()[0][0]
 
+def get_attributes(conn, id):
+    statement = '''
+    SELECT attributes FROM data WHERE id=?
+    '''
+    cur = conn.cursor()
+    cur.execute(statement, (str(id),))
+    return cur.fetchall()[0][0]
+
 if __name__ == "__main__":
     import DBCreator as db
     gene = "AADACL3"

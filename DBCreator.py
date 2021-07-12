@@ -1,5 +1,6 @@
-import sqlite3
+import sqlite3, os
 from sqlite3 import Error
+import settings
 
 #create a connection (new db if it doesn't exist)
 def create_connection(db_file):
@@ -69,5 +70,6 @@ def create_mapping(conn, mapping):
 
 if __name__ == '__main__':
     #create_connection(r"F:\Skolgrejer\LÄKARPROGRAMMET\SOFOSKO\Databases\pythonsqlite.db")
-    create_table(create_connection(r"F:\Skolgrejer\LÄKARPROGRAMMET\SOFOSKO\Databases\pythonsqlite.db"), create_table_data)
-    create_table(create_connection(r"F:\Skolgrejer\LÄKARPROGRAMMET\SOFOSKO\Databases\pythonsqlite.db"), create_table_mapping)
+    db_file = os.path.join(settings.dir_loc, settings.db_name)
+    create_table(create_connection(db_file), create_table_data)
+    create_table(create_connection(db_file), create_table_mapping)

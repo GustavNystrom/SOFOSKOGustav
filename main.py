@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import os, logging, csv
 import matplotlib.pyplot as plt
-
+from collections import Counter
 
 
 def main(maf):
@@ -31,6 +31,8 @@ def main(maf):
     test2.mutations_per_gene(df,settings.value_count_file_name, base_path=settings.dir_loc)
     logging.info('Finished running mutations per gene')
 
+    
+
     #Contains the matched rows with the id from the database match appended at the end
     matched_rows, missing_genes = Mutation.compare_mutations(df, conn)
 
@@ -43,38 +45,60 @@ def main(maf):
     logging.info('Finished creating new dataframe')
     print(f"Identified {len(df)-missing_genes}/{len(df)} entries")
     print(f"Matched {len(new_df)} entries to new file")
-
     plt.bar(new_df['Hugo_Symbol'].value_counts()[0:settings.n_mutations].index,
     new_df['Hugo_Symbol'].value_counts()[0:settings.n_mutations])
     plt.title('Number of mutations matched to an annotated domain per gene')
     plt.ylabel('Number of mutations')
     plt.xlabel('Gene name')
-    plt.show()
-    features = []
+    plt.savefig(os.path.join(settings.dir_loc, settings.matched_mut_per_gene_name))
+    #plt.show()
+    regions, sites, aa_modifications, domain_ids = [], [], [], []
     with open(os.path.join(settings.dir_loc, settings.features_affected), 'w') as file:
         for i in new_df['Matched_ID']:
-            feature = test_script.get_feature(conn, i)
-            # print(feature)
-            # if feature in features:
-            #     print('in')
-            #     #dict = {feature: features[feature] + 1}
-            #     #features.update(dict)
-            #     features[feature] += 1
-            #     print(features[feature])
-            # else:
-            #     features[feature] = 1
-            features.append(feature)
-        d = pd.Series(features)
-        d.value_counts().to_csv(file,sep='\t')
-        print(len(d))
+            i = i.split(',')
+            for id in i:
+                feature = test_script.get_feature(conn, id)
+                if feature in settings.uniprot_regions:
+                    regions.append(feature)
+                    if feature == "Domain":
+                        domain_ids.append(id)
+                elif feature in settings.uniprot_sites:
+                    sites.append(feature)
+                elif feature in settings.unprot_aa_modifications:
+                    aa_modifications.append(feature)
+        writer = csv.writer(file, delimiter='\t')
+        file.write('##The most common regions affected:\n\n')
+        counter = Counter(regions).most_common()
+        for key, item in counter:
+            writer.writerow([key, item])
+        
+        file.write('\n\n##The most common sites affected:\n\n')
+        counter = Counter(sites).most_common()
+        for key, item in counter:
+            writer.writerow([key, item])
+        
+        file.write('\n\n##The most common amino acid modifications affected:\n\n')
+        counter = Counter(aa_modifications).most_common()
+        for key, item in counter:
+            writer.writerow([key, item])
+        
+        file.write('\n\n##The 10 most common domain descriptions:\n\n')
+        domain_descs = []
+        for id in domain_ids:
+            note = Mutation.get_note(id, conn)
+            domain_descs.append(note)
+        counter = Counter(domain_descs).most_common()[:10]
+        for key, item in counter:
+            writer.writerow([key, item])
+        # d = pd.Series(features)
+        # d.value_counts().to_csv(file,sep='\t')
         print(len(new_df))
-            
-        # writer = csv.writer(file, delimiter='\t')
-        # for i in features.items():
-        #     writer.writerow([i[0], i[1]])
 
 if __name__ == "__main__":
-    value_count_file_name = 'mutations_per_gene.txt'
-    maf_location = r'C:\Users\gusny\OneDrive\Dokument\SOFOSKO\test_maf.txt'
+    from datetime import datetime
+    now = datetime.now()
+    maf_location = r'F:\Skolgrejer\LÄKARPROGRAMMET\SOFOSKO\MAF\BGI_MAF_1p36.txt'
     main(maf_location)
+    now2 = datetime.now()
+    print(now2 - now)
     #mutations_per_gene(pd.read_csv(maf_location, sep="\t"), value_count_file_name, base_path=os.path.dirname(maf_location))
