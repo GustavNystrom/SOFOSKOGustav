@@ -1,7 +1,8 @@
-import os, logging
-import settings
+import os.path, logging, csv
+import settings, test_script, Mutation
 import matplotlib.pyplot as plt
 import pandas as pd
+from collections import Counter
 
 def gene_list(genes, filename):
    # Create a file containing each unique item from a list
@@ -53,3 +54,43 @@ def matched_mutations_per_gene(df, dir_loc=settings.dir_loc):
     plt.xlabel('Gene name')    
     plt.savefig(os.path.join(dir_loc, settings.matched_mut_per_gene_name))
     plt.show()
+
+def features_affected(df, conn, dir_loc=settings.dir_loc):
+    regions, sites, aa_modifications, domain_ids = [], [], [], []
+    with open(os.path.join(dir_loc, settings.features_affected), 'w') as file:
+        for i in df['Matched_ID']:
+            i = i.split(',')
+            for id in i:
+                feature = test_script.get_feature(conn, id)
+                if feature in settings.uniprot_regions:
+                    regions.append(feature)
+                    if feature == "Domain":
+                        domain_ids.append(id)
+                elif feature in settings.uniprot_sites:
+                    sites.append(feature)
+                elif feature in settings.unprot_aa_modifications:
+                    aa_modifications.append(feature)
+        writer = csv.writer(file, delimiter='\t')
+        file.write('##The most common regions affected:\n\n')
+        counter = Counter(regions).most_common()
+        for key, item in counter:
+            writer.writerow([key, item])
+        
+        file.write('\n\n##The most common sites affected:\n\n')
+        counter = Counter(sites).most_common()
+        for key, item in counter:
+            writer.writerow([key, item])
+        
+        file.write('\n\n##The most common amino acid modifications affected:\n\n')
+        counter = Counter(aa_modifications).most_common()
+        for key, item in counter:
+            writer.writerow([key, item])
+        
+        file.write('\n\n##The 10 most common domain descriptions:\n\n')
+        domain_descs = []
+        for id in domain_ids:
+            note = Mutation.get_note(id, conn)
+            domain_descs.append(note)
+        counter = Counter(domain_descs).most_common()[:10]
+        for key, item in counter:
+            writer.writerow([key, item])
