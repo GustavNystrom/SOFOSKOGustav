@@ -1,5 +1,5 @@
 import PySimpleGUI as sg
-import main, testDB
+import main, DBCreator
 import os.path
 
 sg.theme('BluePurple')
@@ -56,7 +56,7 @@ while True:  # Event Loop
             if values['-GFF-'] == '' or values['-MAPPING-'] == '':
                 sg.popup('A GFF and Mapping file has to be specified! Get them from uniprot using the gene list!')
                 continue
-            testDB.create_db(file_gff=values['-GFF-'],
+            DBCreator.create_db(file_gff=values['-GFF-'],
             file_mapping=values['-MAPPING-'],
             dir_loc=os.path.dirname(values['-MAF-'])
             )

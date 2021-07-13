@@ -1,6 +1,6 @@
 import re, logging
 import numpy as np
-import test_script
+import db_commands
 import settings
 import pandas as pd
 
@@ -117,7 +117,7 @@ def compare_mutations(df, conn):
         logging.debug(f'Created a Mutation object from row {rown}')
 
         #Get all the annotated rows from the database which maps to this gene
-        uniprot_annotated = test_script.get_rows_from_gene_name(conn, row.gene)
+        uniprot_annotated = db_commands.get_rows_from_gene_name(conn, row.gene)
         if uniprot_annotated == []:
             missing_genes += 1
             logging.info('Missing gene appended. Continuing...')
@@ -173,7 +173,7 @@ def compare_mutations(df, conn):
 
 # Get the note for a domain
 def get_note(id, conn):
-    attrs = test_script.get_attributes(conn=conn, id=id)
+    attrs = db_commands.get_attributes(conn=conn, id=id)
     expression = 'Note=([^;]+)'
     match = re.compile(expression).match(attrs)
     return match.group(1)

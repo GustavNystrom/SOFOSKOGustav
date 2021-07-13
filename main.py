@@ -1,4 +1,4 @@
-import DBCreator, settings, test2, test_script
+import DBCreator, settings, core, db_commands
 import Mutation
 import pandas as pd
 import numpy as np
@@ -18,7 +18,7 @@ def main(maf, dir_loc=settings.dir_loc, db_name=settings.db_name):
     conn = DBCreator.create_connection(db_file)
     logging.info(f'Connected to database: {db_file}')
 
-    test2.mutations_per_gene(df,settings.value_count_file_name, base_path=dir_loc)
+    core.mutations_per_gene(df,settings.value_count_file_name, base_path=dir_loc)
     logging.info('Finished running mutations per gene')
     
 
@@ -30,13 +30,13 @@ def main(maf, dir_loc=settings.dir_loc, db_name=settings.db_name):
 
             #TODO: what to do with annotated_withinid??
     logging.info('Finished working through the dataframe')
-    new_df = test2.create_dataframe(matched_rows, settings.dataframe_filename, dir_loc)
+    new_df = core.create_dataframe(matched_rows, settings.dataframe_filename, dir_loc)
     logging.info('Finished creating new dataframe')
     print(f"Identified {len(df)-missing_genes}/{len(df)} entries")
     print(f"Matched {len(new_df)} entries to new file")
-    test2.matched_mutations_per_gene(new_df, dir_loc=dir_loc)
+    core.matched_mutations_per_gene(new_df, dir_loc=dir_loc)
     
-    test2.features_affected(new_df, conn, dir_loc=dir_loc)
+    core.features_affected(new_df, conn, dir_loc=dir_loc)
     print(len(new_df))
     print('Finished analyzing!')
 
@@ -44,9 +44,9 @@ def create_gene_list(df, filename=settings.gene_list_name, dir_loc=settings.dir_
     if not isinstance(df, pd.DataFrame):
         df = pd.read_csv(df, sep="\t")
     filename=os.path.join(dir_loc, filename)
-    gene_list = test2.get_gene_list(df)
+    gene_list = core.get_gene_list(df)
     logging.info('Successfully created a gene list')
-    test2.gene_list(gene_list, filename)
+    core.gene_list(gene_list, filename)
     logging.info(f'Successfully created a gene list file: {settings.gene_list_name}')
 
 if __name__ == "__main__":
