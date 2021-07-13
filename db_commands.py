@@ -15,6 +15,17 @@ def gene_name_to_uniprotID(conn, name):
     cur.execute(statement, (name,))
     return cur.fetchall()
 
+def uniprotid_to_gene_name(conn, uniprotID):
+    """
+    Returntype: string
+    """
+    statement = '''
+    SELECT gene_name FROM mapping WHERE uniprotID=?
+    '''
+    cur = conn.cursor()
+    cur.execute(statement, (uniprotID,))
+    return cur.fetchall()[0][0]
+
 def retrieve_gene(conn,name):
     statement = '''
     SELECT * FROM data WHERE uniprotID=?
@@ -67,7 +78,7 @@ def get_attributes(conn, id):
 if __name__ == "__main__":
     import DBCreator as db
     gene = "AADACL3"
-    conn = db.create_connection(r'C:\Users\gusny\OneDrive\Dokument\SOFOSKO\pythonsqlite.db')
+    conn = db.create_connection(r'C:\Users\gusny\OneDrive\Dokument\SOFOSKO\testdb.db')
     
     # for gene in genes:
     #     print(gene)
@@ -79,5 +90,6 @@ if __name__ == "__main__":
     # print(uniprotid[0][0])
     # items = retrieve_gene(conn,uniprotid[0][0])
     # pprint.pprint(items)
-    print(get_rows_from_gene_name(conn, 'PLCH2'))
+    #print(get_rows_from_gene_name(conn, 'PLCH2'))
     print(get_row_from_ID(conn, 5))
+    #print(uniprotid_to_gene_name(conn, 'Q5VUY0'))

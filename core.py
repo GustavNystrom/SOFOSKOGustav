@@ -3,6 +3,7 @@ import settings, db_commands, Mutation
 import matplotlib.pyplot as plt
 import pandas as pd
 from collections import Counter
+from xlsxwriter.workbook import Workbook
 
 def gene_list(genes, filename):
    # Create a file containing each unique item from a list
@@ -94,3 +95,39 @@ def features_affected(df, conn, dir_loc=settings.dir_loc):
         counter = Counter(domain_descs).most_common()[:10]
         for key, item in counter:
             writer.writerow([key, item])
+
+        features_counter(df, conn, writer, file)
+    
+    features_affected_to_xl(os.path.join(dir_loc, settings.features_affected))
+
+def features_counter(df, conn, writer, file):
+    """Writer is a csv writer, file is an opened file to write to"""
+    matched_ids = []
+    for matched_id in df['Matched_ID']:
+        matched_ids_current = matched_id.split(',')
+        matched_ids += matched_ids_current
+    matched_ids = Counter(matched_ids).most_common()
+    file.write('\n\n##Regions that have multiple mutations:\nID\tGENE\tREGION\tNOTE\tRECURRENCES \n\n')
+    for id, recurrences in matched_ids:       
+        if recurrences >= 2:
+            row = db_commands.get_row_from_ID(conn, id)
+            gene = db_commands.uniprotid_to_gene_name(conn, row[1])
+            try:
+                note = Mutation.get_note(id, conn)
+            except AttributeError as e:
+                note = ''
+            writer.writerow([id, gene, row[3], note, recurrences])
+
+    
+    #ID GENE REGION NOTE(POSSIBLE) RECURRENCES
+    #id gene row[3] note recurrences
+
+def features_affected_to_xl(file):
+    workbook = Workbook(file[:-4] + '.xlsx')
+    worksheet = workbook.add_worksheet()
+    with open(file, 'rt', encoding='utf8') as f:
+        reader = csv.reader(f, delimiter='\t')
+        for r, row in enumerate(reader):
+            for c, col in enumerate(row):
+                worksheet.write(r, c, col)
+    workbook.close()
