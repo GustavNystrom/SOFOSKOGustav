@@ -2,6 +2,7 @@ import re, logging
 import numpy as np
 import test_script
 import settings
+import pandas as pd
 
 class Mutation:
     # Should initialize from a DataFrame wit the correct column labels to get the __init__ to work
@@ -62,15 +63,27 @@ class Mutation:
                 site = (int(matches[0][1]), np.NaN)
         
         elif self.varclass == "In_Frame_Del":
-            matches = re.findall(exp, self.hgvspshort)
-            site = (int(matches[0][1]), int(matches[0][1]))
+            try:
+                matches = re.findall(exp, self.hgvspshort)
+                site = (int(matches[0][1]), int(matches[0][1]))
+            except (TypeError) as e:
+                logging.warning(f'Missing data for {self.gene}\nHGVSpshort = {self.hgvspshort}')
+                print('Missing data')
+                site = np.NaN
+
 
         elif self.varclass == "In_Frame_Ins":
-            matches = re.findall(exp, self.hgvspshort)
-            if matches[1][1] == '':
-                site = (int(matches[0][1]), int(matches[0][1]))
-            else:
-                site = (int(matches[0][1]), int(matches[1][1]))
+            
+            try:
+                matches = re.findall(exp, self.hgvspshort)
+                if matches[1][1] == '':
+                    site = (int(matches[0][1]), int(matches[0][1]))
+                else:
+                    site = (int(matches[0][1]), int(matches[1][1]))
+            except (TypeError) as e:
+                logging.warning(f'Missing data for {self.gene}\nHGVSpshort = {self.hgvspshort}')
+                print('Missing data')
+                site = np.NaN
         
         #TODO: Try to understand what to do with these better...
         elif self.varclass == "Translation_Start_Site" or self.varclass == "Nonstop_Mutation":
@@ -88,7 +101,12 @@ def compare_mutations(df, conn):
     sep = ','
     #df = df.drop(df.loc[df['Variant_Classification'] == 'Silent'].index, 
     #inplace=False, axis=0)
-    df = df.loc[df['Variant_Classification'] == 'Missense_Mutation']
+    df2 = df.loc[df['Variant_Classification'] == 'Missense_Mutation']
+    df3 = df.loc[df['Variant_Classification'] == 'In_Frame_Del']
+    df4 = df.loc[df['Variant_Classification'] == 'In_Frame_Ins']
+    df = pd.merge(df2, df3, how='outer')
+    df = pd.merge(df, df4, how='outer')
+    print(f"{len(df)} rows will be analyzed")
     for rown in range(len(df)):
         logging.debug(f'Started working on row number {rown}')
         if rown % 1000 == 0:

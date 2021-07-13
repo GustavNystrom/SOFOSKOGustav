@@ -4,6 +4,8 @@ def gene_name_to_uniprotID(conn, name):
     """
     :name: string
     :return: list(tuple)
+    return type is [(id1,), (id2,)]
+    
     """
 
     statement = '''
@@ -22,11 +24,14 @@ def retrieve_gene(conn,name):
     return cur.fetchall()
 
 def get_rows_from_gene_name(conn, name):
+    """
+    Return type is [(id, uniprotid ,...), (id2, unirptoid2, ...)]
+    The reason it returns rows[0] is because rows is list(list(tuple,tuple,tuple....))
+    """
     uniID = gene_name_to_uniprotID(conn, name)
     rows = []
     for i in uniID:
         rows.append(retrieve_gene(conn,i[0]))
-    
     try:
         logging.debug(f'Got rows in db from gene name: {name}')
         return rows[0]

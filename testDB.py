@@ -21,7 +21,9 @@ def create_db(file_gff=os.path.join(settings.dir_loc, settings.gff_name),
         DBCreator.create_data(conn, data_tuple)
         if (i[0]+1) % 1000 == 0:
             logging.info("Inserted 1000 rows into data table")
+            print('Inserted 1000 rows into data table')
     logging.info("Inserted data")
+    print("Inserted data")
 
     for i in enumerate(GFFParser.map_parse(file_mapping)):
         map_data = (i[0]-1,) + tuple(i[1])
@@ -30,6 +32,9 @@ def create_db(file_gff=os.path.join(settings.dir_loc, settings.gff_name),
         DBCreator.create_mapping(conn, map_data)
         if (i[0]+1) % 1000 == 0:
             logging.info("Inserted 1000 rows into mapping table")
+            print("Inserted 1000 rows into mapping table")
     logging.info("Inserted mapping")
+    print("Inserted mapping")
 
-    logging.info("Finished the code")
+    logging.info("Finished creating database")
+    print('Finished creating database')

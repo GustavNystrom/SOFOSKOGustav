@@ -34,13 +34,7 @@ def main(maf, dir_loc=settings.dir_loc, db_name=settings.db_name):
     logging.info('Finished creating new dataframe')
     print(f"Identified {len(df)-missing_genes}/{len(df)} entries")
     print(f"Matched {len(new_df)} entries to new file")
-    plt.bar(new_df['Hugo_Symbol'].value_counts()[0:settings.n_mutations].index,
-    new_df['Hugo_Symbol'].value_counts()[0:settings.n_mutations])
-    plt.title('Number of mutations matched to an annotated domain per gene')
-    plt.ylabel('Number of mutations')
-    plt.xlabel('Gene name')
-    plt.show()
-    plt.savefig(os.path.join(dir_loc, settings.matched_mut_per_gene_name))
+    test2.matched_mutations_per_gene(new_df, dir_loc=dir_loc)
     regions, sites, aa_modifications, domain_ids = [], [], [], []
     with open(os.path.join(dir_loc, settings.features_affected), 'w') as file:
         for i in new_df['Matched_ID']:
@@ -79,9 +73,8 @@ def main(maf, dir_loc=settings.dir_loc, db_name=settings.db_name):
         counter = Counter(domain_descs).most_common()[:10]
         for key, item in counter:
             writer.writerow([key, item])
-        # d = pd.Series(features)
-        # d.value_counts().to_csv(file,sep='\t')
         print(len(new_df))
+        print('Finished analyzing!')
 
 def create_gene_list(df, filename=settings.gene_list_name, dir_loc=settings.dir_loc):
     if not isinstance(df, pd.DataFrame):

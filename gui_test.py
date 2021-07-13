@@ -45,7 +45,7 @@ while True:  # Event Loop
             if values['-MAF-'] == '':
                 sg.popup('A MAF-file has to be specified!')
                 continue
-            main.create_gene_list(values['-MAF-'])
+            main.create_gene_list(values['-MAF-'], dir_loc=os.path.dirname(values['-MAF-']))
             sg.popup('''1. Go to:\n https://www.uniprot.org/uploadlists/ \n
             2. Upload your gene list file.
             3. FROM: Gene name (or geneID) \n TO: UniProtKB \n ORGANISM: Homo sapiens (human) [9606]. \n
@@ -54,7 +54,7 @@ while True:  # Event Loop
         
         elif values['-DB_CREATE-']:
             if values['-GFF-'] == '' or values['-MAPPING-'] == '':
-                sg.popup('A GFF and Mapping file has to be specified! Get them from uniprot from the gene list!')
+                sg.popup('A GFF and Mapping file has to be specified! Get them from uniprot using the gene list!')
                 continue
             testDB.create_db(file_gff=values['-GFF-'],
             file_mapping=values['-MAPPING-'],

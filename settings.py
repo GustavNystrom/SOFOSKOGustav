@@ -1,9 +1,9 @@
-# Location where new files are created
+# Location where new files are created if not specified otherwise when calling functions
 
 dir_loc = r'C:\Users\gusny\OneDrive\Dokument\SOFOSKO'
 
-#Main_function
 
+# Names for the files being created:
 # Database name
 db_name = 'testdb.db'
 
@@ -22,15 +22,25 @@ dataframe_filename = 'matched_mutations.txt'
 #Filename for genelist
 gene_list_name = 'gene_list.txt'
 
-# mutations per gene shown in graph
-n_mutations = 10
-
 # plot names
-
 mutations_per_gene_name = 'mutations_per_gene.png'
 matched_mut_per_gene_name = 'matched_mutations_per_gene.png'
 
-#DataFrame labels
+#Logging filename
+logging_name = 'Runtime_log.log'
+
+#Logging database creation
+logging_db_name = 'DB_log.log'
+
+#Features affected name
+features_affected = 'features_affected.txt'
+
+
+
+# mutations per gene shown in graph
+n_mutations = 10
+
+#DataFrame labels = the columns for the new dataframe/Maf-file that is generated.
 df_labels = [
 'Hugo_Symbol',
 'Chromosome',
@@ -54,17 +64,10 @@ df_labels = [
 'Matched_ID' # The ID in the database it matched
 ]
 
-#Logging filename
-logging_name = 'Runtime_log.log'
-
-#Logging database creation
-logging_db_name = 'DB_log.log'
-
-#Features affected name
-features_affected = 'features_affected.txt'
 
 
-#Domains to skip
+
+#Domains to skip: won't try to match domains with these labels
 domains_skip = [
 'Chain',
 'Natural variant',
@@ -73,6 +76,7 @@ domains_skip = [
 'Helix',
 'Beta strand',
 'Turn']
+
 
 #Regions
 uniprot_regions = [
